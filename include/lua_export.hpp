@@ -1,34 +1,47 @@
+/*
+ * lua_export.hpp
+ *
+ * This file provides a structure for a Tolua++-like export interface
+ * and a class registry for interfacing C++ with Lua.
+ *
+ * Author: Your Name (please replace)
+ */
+
 #ifndef LUA_EXPORT_HPP
 #define LUA_EXPORT_HPP
 
 #include <lua.hpp>
 #include <string>
-#include <typeinfo>
-#include <unordered_map>
+#include <map>
 
-class LuaBinder {
+// Forward declaration of the class registry
+class LuaRegistry;
+
+class LuaExport {
 public:
-    LuaBinder(lua_State* L) : L(L) {}
+    // Method to register a class
+    static void RegisterClass(const std::string& className);
 
-    template<typename T>
-    void bindClass(const std::string& className) {
-        // Register class to Lua
-        // Implement the class registration logic here
-    }
+    // Method to bind functions to a specific instance
+    static void BindFunction(const std::string& className, const std::string& functionName, lua_CFunction func);
 
-    template<typename T, typename... Args>
-    void bindMethod(const std::string& methodName, T(*func)(Args...)) {
-        // Bind method to Lua
-        // Implement method binding logic here
-    }
+    // Method to create a Lua object from a C++ object
+    static int CreateLuaObject(lua_State* L);
 
-    // Function to track Lua subclasses
-    void trackSubclass(const std::string& baseClass, const std::string& subClass) {
-        // Implement logic to track Lua subclasses
-    }
+    // Method to retrieve a C++ object from a Lua object
+    static void* GetCppObject(lua_State* L, int index);
+};
+
+class LuaRegistry {
+public:
+    // Method to add class to registry
+    void AddClass(const std::string &className, LuaExport* exporter);
+
+    // Method to find class exporter in registry
+    LuaExport* FindExporter(const std::string &className);
 
 private:
-    lua_State* L; // Lua state
+    std::map<std::string, LuaExport*> classMap;
 };
 
 #endif // LUA_EXPORT_HPP
