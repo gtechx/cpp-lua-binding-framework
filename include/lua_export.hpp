@@ -1,36 +1,34 @@
-// lua_export.hpp
-
 #ifndef LUA_EXPORT_HPP
 #define LUA_EXPORT_HPP
 
 #include <lua.hpp>
 #include <string>
+#include <typeinfo>
+#include <unordered_map>
 
-// Macro for binding C++ class to Lua
-#define LUA_BIND_CLASS(ClassName) \
-    static const char* s_className = #ClassName; \
-    luaL_newmetatable(L, s_className); \
-    lua_pushstring(L, "__index"); \
-    lua_pushvalue(L, -2); \
-    lua_settable(L, -3); \
-    luaL_setfuncs(L, &ClassName::lua_methods, 0); // Register methods
+class LuaBinder {
+public:
+    LuaBinder(lua_State* L) : L(L) {}
 
-// Template to register methods in Lua
-template <typename T>
-struct LuaBinding {
-    static int lua_create(lua_State* L) {
-        T* obj = new T();
-        *(T**)lua_newuserdata(L, sizeof(T*)) = obj;
-        luaL_getmetatable(L, #T);
-        lua_setmetatable(L, -2);
-        return 1;
+    template<typename T>
+    void bindClass(const std::string& className) {
+        // Register class to Lua
+        // Implement the class registration logic here
     }
 
-    static int lua_destroy(lua_State* L) {
-        T* obj = *(T**)luaL_checkudata(L, 1, #T);
-        delete obj;
-        return 0;
+    template<typename T, typename... Args>
+    void bindMethod(const std::string& methodName, T(*func)(Args...)) {
+        // Bind method to Lua
+        // Implement method binding logic here
     }
+
+    // Function to track Lua subclasses
+    void trackSubclass(const std::string& baseClass, const std::string& subClass) {
+        // Implement logic to track Lua subclasses
+    }
+
+private:
+    lua_State* L; // Lua state
 };
 
 #endif // LUA_EXPORT_HPP
